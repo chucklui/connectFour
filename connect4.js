@@ -73,6 +73,7 @@ function makeHtmlBoard() {
 
 function findSpotForCol(x) {
   // TODO: write the real version of this, rather than always returning 5
+
   return 5;
 }
 
@@ -107,6 +108,18 @@ function handleClick(evt) {
   // place piece in board and add to HTML table
   // TODO: add line to update in-memory board
   placeInTable(y, x);
+  board[y][x] = currPlayer;
+  
+  currPlayer = (currPlayer === 1) ? 2 : 1;
+
+  let boardFilled;
+  for(let row of board) {
+     boardFilled = row.every(cell => cell !== null);
+  }
+ 
+  if(boardFilled) return;
+
+
 
   // check for win
   if (checkForWin()) {
