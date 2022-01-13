@@ -73,28 +73,36 @@ function makeHtmlBoard() {
 
 function findSpotForCol(x) {
   // TODO: write the real version of this, rather than always returning 5
-  let emptyCount = 0;
-  for(let i=0; i<HEIGHT; i++){
-    if(board[i][x] === null) emptyCount++;
+  for(let i=HEIGHT - 1; i>=0; i--){
+    if(board[i][x] === null){
+      return i;
+    }
   }
-  if(emptyCount === 0) return null;
-  return emptyCount - 1;
+  return null;
+
+  // let emptyCount = 0;
+  // for(let i=0; i<HEIGHT; i++){
+  //   if(board[i][x] === null) emptyCount++;
+  // }
+  // if(emptyCount === 0) return null;
+  // return emptyCount - 1;
 }
 
 /** placeInTable: update DOM to place piece into HTML table of board */
 
 function placeInTable(y, x) {
   // TODO: make a div and insert into correct table cell
-  let div = document.createElement('div');
-  div.classList.add('piece');
-  div.classList.add('p1');
-  document.getElementById(`${y}-${x}`).appendChild(div);
+  let piece = document.createElement('div');
+  piece.classList.add('piece');
+  piece.classList.add(`p${currPlayer}`);
+  document.getElementById(`${y}-${x}`).appendChild(piece);
 }
 
 /** endGame: announce game end */
 
 function endGame(msg) {
   // TODO: pop up alert message
+  alert(msg);
 }
 
 /** handleClick: handle click of column top to play piece */
@@ -114,27 +122,24 @@ function handleClick(evt) {
   placeInTable(y, x);
   board[y][x] = currPlayer;
   
-  currPlayer = (currPlayer === 1) ? 2 : 1;
-
-  let boardFilled;
-  for(let row of board) {
-     boardFilled = row.every(cell => cell !== null);
-  }
- 
-  if(boardFilled) return;
-
-
-
   // check for win
   if (checkForWin()) {
     return endGame(`Player ${currPlayer} won!`);
   }
-
+  
   // check for tie
   // TODO: check if all cells in board are filled; if so call, call endGame
+  //check the top row of the game to determine boardFilled
 
+  let boardFilled = board[0].every(cell => cell !== null);
+  // for(let row of board[0]) {
+  //   boardFilled = row.every(cell => cell !== null);
+  // }
+  if(boardFilled) return;
+  
   // switch players
   // TODO: switch currPlayer 1 <-> 2
+  currPlayer = (currPlayer === 1) ? 2 : 1;
 }
 
 /** checkForWin: check board cell-by-cell for "does a win start here?" */
@@ -150,11 +155,12 @@ function checkForWin() {
 
     // TODO: Check four cells to see if they're all legal & all color of current
     // player
-    for(let cell of cells) {
-      if(board[cell[0]][cell[1]] === null) return false;
+    for(let [y,x] of cells) {
+      if(!(y >= 0 && y < HEIGHT &&  x >= 0 && x < WIDTH)) {
+        return false;
+      }
     }
-
-    return cells.every(cell => board[cell[0]][cell[1]] === currPlayer);
+    return cells.every(([y,x]) => board[y][x] === currPlayer);
   }
 
   // using HEIGHT and WIDTH, generate "check list" of coordinates
